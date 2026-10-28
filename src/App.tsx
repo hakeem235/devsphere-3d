@@ -21,27 +21,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
-// Below Tailwind's `sm` breakpoint (640px) the WebGL rig is too cramped to be
-// usable and not worth the GPU/battery cost, so it isn't mounted at all there.
-function useIsSmallScreen() {
-  const [isSmall, setIsSmall] = useState(
-    () => typeof window !== 'undefined' && window.innerWidth < 640
-  );
-
-  useEffect(() => {
-    const mql = window.matchMedia('(max-width: 639px)');
-    const update = () => setIsSmall(mql.matches);
-    update();
-    mql.addEventListener('change', update);
-    return () => mql.removeEventListener('change', update);
-  }, []);
-
-  return isSmall;
-}
-
 export default function App() {
-  const isSmallScreen = useIsSmallScreen();
-
   // 3D Scene State
   const [cameraPreset, setCameraPreset] = useState<CameraPreset>('OVERVIEW');
   const [explodedProgress, setExplodedProgress] = useState<number>(0);
@@ -97,21 +77,17 @@ export default function App() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-graphite text-paper font-sans">
-      {/* 1. Full-Bleed Three.js 3D WebGL Canvas (100vw x 100vh) — not mounted on small screens */}
+      {/* 1. Full-Bleed Three.js 3D WebGL Canvas (100vw x 100vh) — camera adapts to fit narrow/portrait viewports */}
       <div className="absolute inset-0 z-0">
-        {isSmallScreen ? (
-          <div className="w-full h-full bg-[radial-gradient(circle_at_50%_30%,rgba(193,122,69,0.12),transparent_60%)] bg-graphite" />
-        ) : (
-          <ThreeCanvas
-            cameraPreset={cameraPreset}
-            explodedProgress={explodedProgress}
-            lightingPreset={lightingPreset}
-            wireframe={wireframe}
-            autoRotate={autoRotate}
-            onSelectHotspot={handleSelectHotspot}
-            onPresetChange={(preset) => setCameraPreset(preset)}
-          />
-        )}
+        <ThreeCanvas
+          cameraPreset={cameraPreset}
+          explodedProgress={explodedProgress}
+          lightingPreset={lightingPreset}
+          wireframe={wireframe}
+          autoRotate={autoRotate}
+          onSelectHotspot={handleSelectHotspot}
+          onPresetChange={(preset) => setCameraPreset(preset)}
+        />
       </div>
 
       {/* 2. Top Navigation Bar */}
@@ -152,8 +128,8 @@ export default function App() {
         </div>
       )}
 
-      {/* 4. Collapsible Bottom Dock (Only when in 3D Studio mode, and the rig exists to control) */}
-      {activeView === 'studio' && !isSmallScreen && (
+      {/* 4. Collapsible Bottom Dock (Only when in 3D Studio mode) */}
+      {activeView === 'studio' && (
         <BottomDock
           cameraPreset={cameraPreset}
           onSelectCamera={(p) => setCameraPreset(p)}

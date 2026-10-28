@@ -14,6 +14,7 @@ import { soundManager } from '../utils/audio';
 // Pre-allocated math objects to ensure zero GC in animation loop
 const _vCamPos = new THREE.Vector3();
 const _vCamTarget = new THREE.Vector3();
+const _vDollyOffset = new THREE.Vector3();
 const _raycaster = new THREE.Raycaster();
 const _mouse = new THREE.Vector2();
 
@@ -840,7 +841,16 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
       }
     }
 
-    // 12. Resize Handler
+    // 12. Resize Handler — on narrow/portrait viewports, dolly the camera back
+    // (relative to each preset's target) so the whole rig stays in frame instead
+    // of being cropped. Presets themselves are untouched; this just scales distance.
+    const FIT_REFERENCE_ASPECT = 1.6; // the aspect the presets were tuned for
+    let cameraFitScale = 1;
+    const updateCameraFitScale = (w: number, h: number) => {
+      const aspect = w / h;
+      cameraFitScale = THREE.MathUtils.clamp(FIT_REFERENCE_ASPECT / aspect, 1, 2.15);
+    };
+
     const handleResize = () => {
       if (!container) return;
       const w = container.clientWidth;
@@ -848,7 +858,9 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+      updateCameraFitScale(w, h);
     };
+    updateCameraFitScale(width, height);
     window.addEventListener('resize', handleResize);
 
     // 13. Smooth Render Loop (Paced for Software WebGL & Lossless 60fps)
@@ -902,6 +914,12 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
       const activePresetConfig = PRESETS[state.cameraPreset] || PRESETS.OVERVIEW;
       _vCamPos.copy(activePresetConfig.pos);
       _vCamTarget.copy(activePresetConfig.target);
+
+      // Dolly back proportionally on narrow/portrait screens so the rig fits in frame
+      if (cameraFitScale > 1.001) {
+        _vDollyOffset.copy(_vCamPos).sub(_vCamTarget).multiplyScalar(cameraFitScale);
+        _vCamPos.copy(_vCamTarget).add(_vDollyOffset);
+      }
 
       // Damped camera motion: 1 - Math.exp(-k * dt)
       const dampFactor = 1 - Math.exp(-5.0 * dt);
