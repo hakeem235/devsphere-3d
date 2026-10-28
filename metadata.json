@@ -1,0 +1,6 @@
+{
+  "name": "DevDimension - 3D Web & Mobile Developer Portfolio",
+  "description": "Interactive 3D profile and portfolio showcase for a senior Web & Mobile Engineer featuring procedural Three.js workstation, smooth animations, live project demos, and technical skills.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

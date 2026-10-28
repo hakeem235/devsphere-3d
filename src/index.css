@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  --color-graphite: #15171c;
+  --color-graphite-deep: #0f1013;
+  --color-panel: #1c1f26;
+  --color-hairline: #2b2f38;
+  --color-copper: #c17a45;
+  --color-copper-dim: #8a5630;
+  --color-solder: #2f6b4f;
+  --color-paper: #edeae2;
+
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Space Grotesk', 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-graphite);
+    color: var(--color-paper);
+    overflow: hidden;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+/* Corner tick-mark panel treatment */
+.tick-panel {
+  position: relative;
+}
+.tick-panel::before,
+.tick-panel::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  border-color: var(--color-copper);
+}
+.tick-panel::before {
+  top: -1px;
+  left: -1px;
+  border-top: 1.5px solid var(--color-copper);
+  border-left: 1.5px solid var(--color-copper);
+}
+.tick-panel::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 1.5px solid var(--color-copper);
+  border-right: 1.5px solid var(--color-copper);
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-graphite-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-hairline);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-copper-dim);
+}
